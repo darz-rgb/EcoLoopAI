@@ -1,83 +1,91 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#075534">
-  <title>EcoLoop AI</title>
-
-  <link rel="stylesheet" href="./style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#12573e">
+  <meta name="app-version" content="882d6d195131">
+  <meta name="description" content="Сортуйте паковання, записуйте масу вторсировини та відстежуйте свої результати.">
+  <title>EcoLoop AI — мій екожурнал</title>
+  <link rel="icon" href="./icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
   <link rel="manifest" href="./manifest.webmanifest">
-  <script src="./app.js" defer></script>
+  <link rel="stylesheet" href="./style.css?v=882d6d195131">
+  <script src="./store.js?v=882d6d195131" defer></script>
+  <script src="./app.js?v=882d6d195131" defer></script>
 </head>
 <body>
-  <main class="app">
-    <header>EcoLoop AI</header>
-    <h1>Як здати це паковання?</h1>
+  <a class="skip-link" href="#main">До вмісту</a>
+  <header class="topbar wrap">
+    <a class="brand" href="./" aria-label="EcoLoop AI — головна">
+      <img src="./icons/icon-192.png" alt="" width="44" height="44">
+      <span>EcoLoop <span class="brand-ai">AI</span></span>
+    </a>
+    <span id="connection" class="connection">Онлайн</span>
+  </header>
 
-    <div class="photo-actions">
-      <button id="take-photo" type="button">
-        Зробити фото
-      </button>
-
-      <button id="choose-photo" type="button">
-        Обрати з галереї
-      </button>
-    </div>
-
-    <input
-      id="camera"
-      type="file"
-      accept="image/*"
-      capture="environment"
-      hidden
-    >
-
-    <input
-      id="photo"
-      type="file"
-      accept="image/*"
-      hidden
-    >
-
-    <p id="photo-status" role="status"></p>
-
-    <img id="preview" alt="Вибране паковання" hidden>
-
-
-
-    <label for="material">Матеріал</label>
-    <select id="material">
-      <option value="">Оберіть матеріал</option>
-      <option value="pet">PET</option>
-      <option value="hdpe">HDPE</option>
-      <option value="aluminum">Алюміній</option>
-      <option value="cardboard">Картон</option>
-      <option value="unknown">Не знаю</option>
-    </select>
-
-    <section id="instructions" aria-live="polite" hidden>
-      <h2>Як здати</h2>
-      <p id="instruction-text"></p>
+  <main id="main" class="wrap">
+    <section id="update-banner" class="update-banner" hidden aria-label="Оновлення застосунку">
+      <div><strong id="update-title">Доступне оновлення</strong><p id="update-description">Завантажте нову версію EcoLoop.</p></div>
+      <button id="apply-update" type="button">Оновити</button>
     </section>
-      <button id="save-sorting" type="button" disabled>
-          Зберегти сортування
-      </button>
+    <p id="global-status" class="status" role="status"></p>
 
-        <p id="save-status" role="status"></p>
+    <div class="intro"><p class="eyebrow">МІЙ ЕКОЖУРНАЛ</p><h1>Маленькі дії.<br>Видимий результат.</h1><p>Зважуйте, сортуйте й записуйте те, що вдалося зібрати.</p></div>
 
-        <section aria-labelledby="history-heading">
-          <h2 id="history-heading">Моя історія</h2>
-          <p>Записи зберігаються у цьому браузері на вашому пристрої.</p>
+    <section class="stats" aria-label="Загальні результати">
+      <div class="stat"><span>Зібрано за записами</span><strong id="total-weight">0 <small>кг</small></strong></div>
+      <div class="stat"><span>Позначено як передане</span><strong id="handed-weight">0 <small>кг</small></strong></div>
+      <div class="stat"><span>Записів у журналі</span><strong id="record-count">0</strong></div>
+    </section>
+    <p class="stats-note">Маса з ваших зважувань. Статус передачі ви позначаєте самостійно.</p>
 
-          <p id="empty-history">Поки немає збережених записів.</p>
-            <ul id="sorting-history"></ul>
-          <button id="export-history" type="button">
-              Завантажити історію CSV
-          </button>
+    <div class="workspace">
+      <section class="card entry-card" aria-labelledby="form-heading">
+        <div class="section-top"><h2 id="form-heading">Додати сортування</h2><span class="small-label">Новий запис</span></div>
+        <form id="sorting-form">
+          <div class="photo-area">
+            <div id="photo-placeholder"><span class="photo-symbol" aria-hidden="true">＋</span><p>Покажіть паковання</p><span>Зробіть фото або оберіть з галереї</span></div>
+            <img id="preview" alt="Вибране паковання" hidden>
+            <button id="remove-photo" class="photo-remove" type="button" hidden aria-label="Прибрати фото">×</button>
+          </div>
+          <div class="photo-actions"><button id="take-photo" class="secondary" type="button">Зробити фото</button><button id="choose-photo" class="secondary" type="button">З галереї</button></div>
+          <input id="camera" type="file" accept="image/*" capture="environment" hidden>
+          <input id="photo" type="file" accept="image/*" hidden>
+          <p id="photo-status" class="field-help" role="status"></p>
 
-            <p id="export-status" role="status"></p>
+          <label for="material">Матеріал</label>
+          <select id="material" required><option value="">Оберіть матеріал</option><option value="pet">PET · пластик 1</option><option value="hdpe">HDPE · пластик 2</option><option value="aluminum">Алюміній</option><option value="cardboard">Картон</option><option value="unknown">Не знаю</option></select>
+          <section id="instructions" class="instructions" hidden aria-labelledby="instructions-heading"><h3 id="instructions-heading">Як підготувати</h3><p id="instruction-text"></p></section>
+
+          <label for="weight">Маса <span class="optional">за наявності зважування</span></label>
+          <div class="weight-row"><input id="weight" type="text" inputmode="decimal" placeholder="Наприклад, 0,25" aria-describedby="weight-help"><select id="weight-unit" aria-label="Одиниця маси"><option value="kg">кг</option><option value="g">г</option></select></div>
+          <p id="weight-help" class="field-help">Мінімальна точність — 1 г. Записи без маси також можна зберігати.</p>
+
+          <label for="record-status">Стан вторсировини</label>
+          <select id="record-status"><option value="sorted">Відсортовано</option><option value="handed">Передано на приймання</option></select>
+          <label for="note">Примітка <span class="optional">необов’язково</span></label>
+          <textarea id="note" rows="2" maxlength="200" placeholder="Наприклад, пляшки після прибирання"></textarea>
+          <button id="save-sorting" class="primary full" type="submit" disabled>Зберегти запис</button>
+          <button id="cancel-edit" class="text-button full" type="button" hidden>Скасувати редагування</button>
+          <p id="save-status" class="status" role="status"></p>
+        </form>
+      </section>
+
+      <div class="journal-column">
+        <section class="card" aria-labelledby="materials-heading"><h2 id="materials-heading">За матеріалами</h2><div id="material-totals" class="material-totals"></div><p id="unweighed-note" class="field-help"></p></section>
+        <section class="card history-card" aria-labelledby="history-heading">
+          <div class="section-top"><h2 id="history-heading">Моя історія</h2><span id="history-count" class="small-label">0 записів</span></div>
+          <div class="filters"><div><label for="filter-material">Матеріал</label><select id="filter-material"><option value="all">Усі матеріали</option><option value="pet">PET</option><option value="hdpe">HDPE</option><option value="aluminum">Алюміній</option><option value="cardboard">Картон</option></select></div><div><label for="filter-status">Стан</label><select id="filter-status"><option value="all">Усі стани</option><option value="sorted">Відсортовано</option><option value="handed">Передано</option></select></div></div>
+          <p id="empty-history" class="empty-state">Тут з’являться ваші записи. Почніть з першого сортування.</p>
+          <ul id="sorting-history" class="history-list"></ul>
+          <div id="undo-panel" class="undo-panel" hidden><span>Запис видалено.</span><button id="undo-delete" type="button" class="text-button">Повернути</button></div>
         </section>
+        <section class="card data-card" aria-labelledby="data-heading"><h2 id="data-heading">Мої дані</h2><p>Журнал зберігається на цьому пристрої. Резервну копію можна перенести на інший.</p><div class="data-actions"><button id="export-history" class="secondary" type="button">CSV для Excel</button><button id="backup-history" class="secondary" type="button">Резервна копія</button><button id="restore-history" class="text-button" type="button">Імпортувати копію</button></div><input id="backup-file" type="file" accept=".json,application/json" hidden><p id="export-status" class="status" role="status"></p></section>
+      </div>
+    </div>
+    <noscript><p class="card">Для роботи екожурналу увімкніть JavaScript у браузері.</p></noscript>
   </main>
+  <footer class="footer wrap"><div><strong>EcoLoop AI</strong><span id="app-version">Версія 2.0</span></div><button id="check-update" class="text-button" type="button">Перевірити оновлення</button><a href="./update.html">Відновити оновлення</a></footer>
 </body>
 </html>

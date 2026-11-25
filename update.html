@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#12573e"><title>Оновлення EcoLoop</title>
+<style>body{font-family:system-ui,sans-serif;background:#f5f6ef;color:#183d30;margin:0;padding:24px;line-height:1.6}main{max-width:480px;margin:12vh auto;background:white;border:1px solid #dde4da;border-radius:20px;padding:28px}h1{font-size:28px;line-height:1.2}button,a{font:inherit}button{background:#12573e;color:white;border:0;border-radius:10px;padding:14px 20px;cursor:pointer}button:disabled{opacity:.6}#status{overflow-wrap:anywhere}a{color:#12573e}</style>
+</head>
+<body><main><h1>Оновлення EcoLoop</h1><p>Відкрийте цю сторінку з інтернетом, щоб завантажити актуальну версію застосунку.</p><button id="update" type="button">Завантажити оновлення</button><p id="status" role="status"></p><a id="return" href="./">До застосунку</a></main>
+<script>
+"use strict";
+const button = document.getElementById("update");
+const status = document.getElementById("status");
+button.addEventListener("click", async () => {
+  button.disabled = true;
+  status.textContent = "Завантажуємо файли…";
+  try {
+    if (!("serviceWorker" in navigator)) throw new Error("Відкрийте сторінку через HTTPS у Chrome або Safari.");
+    // Унікальні URL обходять старий кеш під час одноразового переходу.
+    const versionUrl = new URL("./version.json", location.href);
+    versionUrl.searchParams.set("check", Date.now());
+    const response = await fetch(versionUrl, { cache: "no-store" });
+    if (!response.ok) throw new Error("Файли ще не опубліковано. Дочекайтеся завершення GitHub Actions.");
+    const version = await response.json();
+    if (typeof version.version !== "string") throw new Error("Сервер повернув некоректну версію.");
+    const registration = await navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" });
+    await registration.update();
+    if (registration.installing) {
+      const worker = registration.installing;
+      await new Promise((resolve, reject) => {
+        const timer = setTimeout(() => finish(new Error("Завантаження триває. Спробуйте ще раз.")), 45000);
+        function finish(error) { clearTimeout(timer); worker.removeEventListener("statechange", changed); error ? reject(error) : resolve(); }
+        function changed() {
+          if (["installed", "activated"].includes(worker.state)) finish();
+          if (worker.state === "redundant") finish(new Error("Перевірте, що всі файли та папку icons завантажено на GitHub."));
+        }
+        worker.addEventListener("statechange", changed);
+        changed();
+      });
+    }
+    if (registration.waiting) {
+      await new Promise((resolve, reject) => {
+        const worker = registration.waiting;
+        const timer = setTimeout(() => finish(new Error("Повторіть оновлення після закриття інших вікон EcoLoop.")), 15000);
+        function finish(error) { clearTimeout(timer); worker.removeEventListener("statechange", changed); error ? reject(error) : resolve(); }
+        function changed() { if (worker.state === "activated") finish(); if (worker.state === "redundant") finish(new Error("Оновлення перервано.")); }
+        worker.addEventListener("statechange", changed);
+        worker.postMessage({ type: "SKIP_WAITING" });
+        changed();
+      });
+    }
+    const target = new URL("./", location.href);
+    target.searchParams.set("updated", Date.now());
+    location.replace(target);
+  } catch (error) {
+    status.textContent = error.message;
+    button.disabled = false;
+  }
+});
+</script></body></html>
