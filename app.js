@@ -4,6 +4,11 @@ const materialSelect = document.querySelector("#material");
 const instructions = document.querySelector("#instructions");
 const instructionText = document.querySelector("#instruction-text");
 
+const cameraInput = document.querySelector("#camera");
+const takePhotoButton = document.querySelector("#take-photo");
+const choosePhotoButton = document.querySelector("#choose-photo");
+const photoStatus = document.querySelector("#photo-status");
+
 const tips = {
   pet: "Знайдіть маркування 1 PET. Спорожніть паковання та перевірте правила обраного пункту приймання.",
   hdpe: "Знайдіть маркування 2 HDPE. Перевірте, чи приймає пункт саме цей вид паковання.",
@@ -14,37 +19,60 @@ const tips = {
 
 let previewUrl;
 
-photoInput.addEventListener("change", () => {
-  if (previewUrl) {
-    URL.revokeObjectURL(previewUrl);
-    previewUrl = undefined;
-  }
+takePhotoButton.addEventListener("click", () => {
+  cameraInput.click();
+});
 
-  const file = photoInput.files[0];
+choosePhotoButton.addEventListener("click", () => {
+  photoInput.click();
+});
 
+function showPhoto(file) {
+  // При скасуванні вибору залишаємо попереднє фото.
   if (!file) {
-    preview.removeAttribute("src");
-    preview.hidden = true;
     return;
   }
 
+  if (file.type && !file.type.startsWith("image/")) {
+    photoStatus.textContent = "Оберіть файл із зображенням.";
+    return;
+  }
+
+  if (previewUrl) {
+    URL.revokeObjectURL(previewUrl);
+  }
+
   previewUrl = URL.createObjectURL(file);
+
+  preview.onload = () => {
+    photoStatus.textContent =
+      "Фото додано. Оберіть матеріал паковання.";
+  };
+
+  preview.onerror = () => {
+    preview.hidden = true;
+    photoStatus.textContent =
+      "Не вдалося відкрити фото. Спробуйте зображення JPG або PNG.";
+  };
+
   preview.src = previewUrl;
   preview.hidden = false;
-});
+  photoStatus.textContent = "Відкриваємо фото…";
 
-materialSelect.addEventListener("change", () => {
-  const text = tips[materialSelect.value];
-
-  instructionText.textContent = text || "";
-  instructions.hidden = !text;
-});
-
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("./sw.js").catch((error) => {
-    console.error("Помилка реєстрації service worker:", error);
-  });
+  // Для нового предмета користувач обирає матеріал заново.
+  materialSelect.value = "";
+  materialSelect.dispatchEvent(new Event("change"));
 }
+
+photoInput.addEventListener("change", () => {
+  showPhoto(photoInput.files[0]);
+  photoInput.value = "";
+});
+
+cameraInput.addEventListener("change", () => {
+  showPhoto(cameraInput.files[0]);
+  cameraInput.value = "";
+});
 
 const saveButton = document.querySelector("#save-sorting");
 const saveStatus = document.querySelector("#save-status");

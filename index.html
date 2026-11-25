@@ -15,10 +15,36 @@
     <header>EcoLoop AI</header>
     <h1>Як здати це паковання?</h1>
 
-    <label for="photo">Додати фото</label>
-    <input id="photo" type="file" accept="image/*">
+    <div class="photo-actions">
+      <button id="take-photo" type="button">
+        Зробити фото
+      </button>
+
+      <button id="choose-photo" type="button">
+        Обрати з галереї
+      </button>
+    </div>
+
+    <input
+      id="camera"
+      type="file"
+      accept="image/*"
+      capture="environment"
+      hidden
+    >
+
+    <input
+      id="photo"
+      type="file"
+      accept="image/*"
+      hidden
+    >
+
+    <p id="photo-status" role="status"></p>
 
     <img id="preview" alt="Вибране паковання" hidden>
+
+
 
     <label for="material">Матеріал</label>
     <select id="material">

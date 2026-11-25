@@ -139,3 +139,37 @@ select {
 #export-status {
   min-height: 24px;
 }
+
+.photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.photo-actions button {
+  flex: 1 1 140px;
+  min-height: 48px;
+  padding: 12px;
+  border: 1px solid #075534;
+  border-radius: 12px;
+  background: white;
+  color: #075534;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#take-photo {
+  background: #075534;
+  color: white;
+}
+
+.photo-actions button:focus-visible {
+  outline: 3px solid #46a879;
+  outline-offset: 3px;
+}
+
+#photo-status {
+  margin: 12px 0;
+}
