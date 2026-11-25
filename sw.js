@@ -1,4 +1,5 @@
-const CACHE_NAME = "ecoloop-v3";
+const CACHE_NAME =
+  `ecoloop-${self.registration.scope}-phone-update-1`;
 
 const APP_FILES = [
   "./",
@@ -12,7 +13,18 @@ const APP_FILES = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_FILES))
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        const requests = APP_FILES.map((path) => {
+          return new Request(
+            new URL(path, self.registration.scope),
+            { cache: "reload" }
+          );
+        });
+
+        return cache.addAll(requests);
+      })
+      .then(() => self.skipWaiting())
   );
 });
 
