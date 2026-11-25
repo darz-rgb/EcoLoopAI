@@ -1,4 +1,4 @@
-const CACHE_NAME = `${CACHE_PREFIX}history-fix-2`;
+const CACHE_NAME = "ecoloop-v3";
 
 const APP_FILES = [
   "./",
