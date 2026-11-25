@@ -129,9 +129,11 @@ saveButton.addEventListener("click", () => {
     return;
   }
 
+  let records;
+
+  // Спочатку перевіряємо саме збереження.
   try {
-    // Читаємо актуальні записи перед кожним збереженням.
-    const records = readHistory();
+    records = readHistory();
 
     records.unshift({
       material,
@@ -139,17 +141,39 @@ saveButton.addEventListener("click", () => {
     });
 
     localStorage.setItem(HISTORY_KEY, JSON.stringify(records));
-    renderHistory(records);
-
-    // Наступний запис починається з нового вибору матеріалу.
-    materialSelect.value = "";
-    materialSelect.dispatchEvent(new Event("change"));
-
-    saveStatus.textContent = "Сортування збережено.";
   } catch (error) {
     saveStatus.textContent =
-      "Не вдалося зберегти запис. Перевірте доступ браузера до сховища.";
-    console.error("Помилка збереження історії:", error);
+      "Не вдалося зберегти запис у браузері.";
+    console.error("Помилка збереження:", error);
+    return;
+  }
+
+  // Запис уже збережено. Готуємо форму до наступної дії.
+  materialSelect.value = "";
+  updateSaveButton();
+  saveStatus.textContent = "Сортування збережено.";
+
+  // Окремо оновлюємо відображення історії.
+  try {
+    instructions.hidden = true;
+    instructionText.textContent = "";
+
+    const missingElements = [
+      "#sorting-history",
+      "#empty-history"
+    ].filter((selector) => !document.querySelector(selector));
+
+    if (missingElements.length > 0) {
+      throw new Error(
+        `У HTML відсутні елементи: ${missingElements.join(", ")}`
+      );
+    }
+
+    renderHistory(records);
+  } catch (error) {
+    saveStatus.textContent =
+      `Запис збережено, але історію не вдалося показати. ${error.message}`;
+    console.error("Помилка відображення історії:", error);
   }
 });
 
@@ -162,3 +186,67 @@ try {
 }
 
 updateSaveButton();
+
+const exportButton = document.querySelector("#export-history");
+const exportStatus = document.querySelector("#export-status");
+
+exportButton.addEventListener("click", () => {
+  try {
+    const records = readHistory();
+
+    if (records.length === 0) {
+      exportStatus.textContent =
+        "Спочатку збережіть хоча б одне сортування.";
+      return;
+    }
+
+    const rows = [
+      ["Матеріал", "Дата і час (UTC)"]
+    ];
+
+    for (const record of records) {
+      rows.push([
+        materialNames[record.material],
+        new Date(record.createdAt).toISOString()
+      ]);
+    }
+
+    const csv = rows
+      .map((row) => row.join(";"))
+      .join("\r\n");
+
+    // BOM допомагає Excel правильно відобразити українські літери.
+    const file = new Blob(["\uFEFF", csv], {
+      type: "text/csv;charset=utf-8"
+    });
+
+    const downloadUrl = URL.createObjectURL(file);
+    const link = document.createElement("a");
+
+    const today = new Date();
+    const dateLabel = [
+      today.getFullYear(),
+      String(today.getMonth() + 1).padStart(2, "0"),
+      String(today.getDate()).padStart(2, "0")
+    ].join("-");
+
+    link.href = downloadUrl;
+    link.download = `ecoloop-history-${dateLabel}.csv`;
+
+    document.body.append(link);
+    link.click();
+    link.remove();
+
+    // Даємо браузеру час розпочати завантаження.
+    setTimeout(() => {
+      URL.revokeObjectURL(downloadUrl);
+    }, 10000);
+
+    exportStatus.textContent =
+      "Файл підготовлено. Перевірте завантаження браузера.";
+  } catch (error) {
+    exportStatus.textContent =
+      "Не вдалося підготувати файл з історією.";
+    console.error("Помилка експорту історії:", error);
+  }
+});
