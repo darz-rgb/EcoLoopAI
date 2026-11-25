@@ -180,6 +180,19 @@ saveButton.addEventListener("click", () => {
   materialSelect.value = "";
   updateSaveButton();
   saveStatus.textContent = "Сортування збережено.";
+  preview.onload = null;
+  preview.onerror = null;
+
+  preview.hidden = true;
+  preview.removeAttribute("src");
+
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      previewUrl = undefined;
+    }
+    photoInput.value = "";
+    cameraInput.value = "";
+    photoStatus.textContent = "";
 
   // Окремо оновлюємо відображення історії.
   try {
