@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#075534">
+  <title>EcoLoop AI</title>
+
+  <link rel="stylesheet" href="./style.css">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <main class="app">
+    <header>EcoLoop AI</header>
+    <h1>Як здати це паковання?</h1>
+
+    <label for="photo">Додати фото</label>
+    <input id="photo" type="file" accept="image/*">
+
+    <img id="preview" alt="Вибране паковання" hidden>
+
+    <label for="material">Матеріал</label>
+    <select id="material">
+      <option value="">Оберіть матеріал</option>
+      <option value="pet">PET</option>
+      <option value="hdpe">HDPE</option>
+      <option value="aluminum">Алюміній</option>
+      <option value="cardboard">Картон</option>
+      <option value="unknown">Не знаю</option>
+    </select>
+
+    <section id="instructions" aria-live="polite" hidden>
+      <h2>Як здати</h2>
+      <p id="instruction-text"></p>
+    </section>
+  </main>
+</body>
+</html>

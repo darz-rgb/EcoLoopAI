@@ -1,0 +1,64 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  background: #f5f7f2;
+  color: #103b29;
+  font-family: Arial, sans-serif;
+}
+
+.app {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 24px;
+  border-radius: 24px;
+  background: white;
+}
+
+header {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+h1 {
+  font-size: 26px;
+}
+
+label {
+  display: block;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+input,
+select {
+  width: 100%;
+  min-height: 48px;
+  font: inherit;
+}
+
+select {
+  padding: 12px;
+  border: 1px solid #075534;
+  border-radius: 12px;
+  background: white;
+}
+
+#preview {
+  width: 100%;
+  max-height: 260px;
+  margin-top: 16px;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+#instructions {
+  margin-top: 24px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #e0f5e5;
+}
