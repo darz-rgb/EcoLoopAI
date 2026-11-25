@@ -62,3 +62,53 @@ select {
   border-radius: 16px;
   background: #e0f5e5;
 }
+
+#save-sorting {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 20px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 12px;
+  background: #075534;
+  color: white;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#save-sorting:disabled {
+  background: #dce3dd;
+  color: #536158;
+  cursor: default;
+}
+
+#save-sorting:focus-visible {
+  outline: 3px solid #46a879;
+  outline-offset: 3px;
+}
+
+#save-status {
+  min-height: 24px;
+}
+
+#sorting-history {
+  padding: 0;
+  list-style: none;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding: 14px;
+  border: 1px solid #dce3dd;
+  border-radius: 12px;
+}
+
+.history-item time {
+  color: #536158;
+  font-size: 14px;
+}
